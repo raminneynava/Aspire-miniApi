@@ -1,0 +1,40 @@
+﻿@page "/Events"
+@using BlazorApp.ApiService
+@inject CalanderApiService calenderApiService
+@rendermode InteractiveServer
+<div class="align-items-center">
+    <input class="form-control-lg text-center" @bind-value="_year" placeholder="Enter Year"/>
+    <input class="form-control-lg text-center" @bind-value="_month" placeholder="Enter Month" />
+    <input class="form-control-lg text-center" @bind-value="_day" placeholder="Enter Day" />
+    <button class="btn btn-primary" @onclick="GetEvents">GetEvents</button>
+
+    @if (_events.Any())
+    {
+        foreach (var item in _events)
+        {
+            <div class="container mt-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Description</h5>
+                        <p class="card-text">@(!string.IsNullOrEmpty(item.AdditionalDescription) ? item.AdditionalDescription:"no info")</p>
+                        <p class="card-text"><strong>it is a holiday?</strong>@(item.IsHoliday?"yes":"no")</p>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private int _year;
+    private int _month;
+    private int _day;
+    private string _date;
+    private List<EventApiModel> _events = new();
+
+    public async Task GetEvents()
+    {
+        _events.Clear();
+        _events = await calenderApiService.GetEvent(_year, _month, _day) ?? new();
+    }
+}
